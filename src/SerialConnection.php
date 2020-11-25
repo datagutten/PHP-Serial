@@ -29,7 +29,7 @@ class SerialConnection
     public $_os = "";
 
     /**
-     * This var says if buffer should be flushed by sendMessage (true) or
+     * This var says if buffer should be flushed by send (true) or
      * manually (false)
      *
      * @var bool
@@ -559,7 +559,7 @@ class SerialConnection
         $this->_buffer .= $message;
 
         if ($this->autoFlush === true) {
-            $this->serialflush();
+            $this->flush();
         }
 
         usleep((int) ($waitForReply * 1000000));
