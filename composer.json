@@ -1,15 +1,21 @@
 {
-    "name": "blamebutton/php-serial",
+    "name": "datagutten/php-serial",
     "description": "Multi-platform serial port access convenience class",
     "license": "GPL-2.0-only",
     "authors": [
         {
             "name": "Bram Ceulemans",
             "email": "bramceulemans@me.com"
+        },
+        {
+            "name": "datagutten",
+            "email": "datagutten@datagutten.net"
         }
     ],
     "minimum-stability": "stable",
     "autoload": {
-        "classmap": ["src/"]
+        "psr-4": {
+            "datagutten\\phpSerial\\": "src"
+        }
     }
 }

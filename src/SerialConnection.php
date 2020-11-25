@@ -1,4 +1,7 @@
 <?php
+
+namespace datagutten\phpSerial;
+
 define ("SERIAL_DEVICE_NOTSET", 0);
 define ("SERIAL_DEVICE_SET", 1);
 define ("SERIAL_DEVICE_OPENED", 2);
@@ -36,7 +39,6 @@ class SerialConnection
     /**
      * Constructor. Perform some checks about the OS and setserial
      *
-     * @return PhpSerial
      */
     public function __construct()
     {
