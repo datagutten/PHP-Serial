@@ -2,6 +2,9 @@
 
 namespace datagutten\phpSerial;
 
+use datagutten\phpSerial\exceptions\SerialException;
+use InvalidArgumentException;
+
 define ("SERIAL_DEVICE_NOTSET", 0);
 define ("SERIAL_DEVICE_SET", 1);
 define ("SERIAL_DEVICE_OPENED", 2);
@@ -39,6 +42,7 @@ class SerialConnection
     /**
      * Constructor. Perform some checks about the OS and setserial
      *
+     * @throws SerialException
      */
     public function __construct()
     {
@@ -64,9 +68,7 @@ class SerialConnection
             $this->_os = "windows";
             register_shutdown_function(array($this, "close"));
         } else {
-            trigger_error("Host OS is neither osx, linux nor windows, unable " .
-                          "to run.", E_USER_ERROR);
-            exit();
+            throw new SerialException("Host OS is neither osx, linux nor windows, unable to run.");
         }
     }
 
@@ -81,8 +83,9 @@ class SerialConnection
      * -> windows : use the COMxx device name, like COM1 (can also be used
      *     with linux)
      *
-     * @param  string $device the name of the device to be used
+     * @param string $device the name of the device to be used
      * @return bool
+     * @throws SerialException
      */
     public function setDevice($device)
     {
@@ -119,22 +122,19 @@ class SerialConnection
                 }
             }
 
-            trigger_error("Specified serial port is not valid", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Specified serial port is not valid");
         } else {
-            trigger_error("You must close your device before to set an other " .
-                          "one", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("You must close your device before to set an other " .
+                          "one");
         }
     }
 
     /**
      * Opens the device for reading and/or writing.
      *
-     * @param  string $mode Opening mode : same parameter as fopen()
+     * @param string $mode Opening mode : same parameter as fopen()
      * @return bool
+     * @throws SerialException
      */
     public function open($mode = "r+b")
     {
@@ -145,21 +145,15 @@ class SerialConnection
         }
 
         if ($this->_dState === SERIAL_DEVICE_NOTSET) {
-            trigger_error(
-                "The device must be set before to be open",
-                E_USER_WARNING
+            throw new SerialException(
+                "The device must be set before to be open"
             );
-
-            return false;
         }
 
         if (!preg_match("@^[raw]\\+?b?$@", $mode)) {
-            trigger_error(
-                "Invalid opening mode : ".$mode.". Use fopen() modes.",
-                E_USER_WARNING
+            throw new InvalidArgumentException(
+                "Invalid opening mode : ".$mode.". Use fopen() modes."
             );
-
-            return false;
         }
 
         $this->_dHandle = @fopen($this->_device, $mode);
@@ -172,15 +166,14 @@ class SerialConnection
         }
 
         $this->_dHandle = null;
-        trigger_error("Unable to open the device", E_USER_WARNING);
-
-        return false;
+        throw new SerialException("Unable to open the device");
     }
 
     /**
      * Closes the device
      *
      * @return bool
+     * @throws SerialException
      */
     public function close()
     {
@@ -195,9 +188,7 @@ class SerialConnection
             return true;
         }
 
-        trigger_error("Unable to close the device", E_USER_ERROR);
-
-        return false;
+        throw new SerialException("Unable to close the device");
     }
 
     //
@@ -213,16 +204,15 @@ class SerialConnection
      * Possible rates : 110, 150, 300, 600, 1200, 2400, 4800, 9600, 38400,
      * 57600 and 115200.
      *
-     * @param  int  $rate the rate to set the port in
+     * @param int $rate the rate to set the port in
      * @return bool
+     * @throws SerialException
      */
     public function setBaudRate($rate)
     {
         if ($this->_dState !== SERIAL_DEVICE_SET) {
-            trigger_error("Unable to set the baud rate : the device is " .
-                          "either not set or opened", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Unable to set the baud rate : the device is " .
+                          "either not set or opened");
         }
 
         $validBauds = array (
@@ -279,18 +269,16 @@ class SerialConnection
      * Configure parity.
      * Modes : odd, even, none
      *
-     * @param  string $parity one of the modes
+     * @param string $parity one of the modes
      * @return bool
+     * @throws SerialException
      */
     public function setParity($parity)
     {
         if ($this->_dState !== SERIAL_DEVICE_SET) {
-            trigger_error(
-                "Unable to set parity : the device is either not set or opened",
-                E_USER_WARNING
+            throw new SerialException(
+                "Unable to set parity : the device is either not set or opened"
             );
-
-            return false;
         }
 
         $args = array(
@@ -300,9 +288,7 @@ class SerialConnection
         );
 
         if (!isset($args[$parity])) {
-            trigger_error("Parity mode not supported", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Parity mode not supported");
         }
 
         if ($this->_os === "linux") {
@@ -326,24 +312,21 @@ class SerialConnection
             return true;
         }
 
-        trigger_error("Unable to set parity : " . $out[1], E_USER_WARNING);
-
-        return false;
+        throw new SerialException("Unable to set parity : " . $out[1]);
     }
 
     /**
      * Sets the length of a character.
      *
-     * @param  int  $int length of a character (5 <= length <= 8)
+     * @param int $int length of a character (5 <= length <= 8)
      * @return bool
+     * @throws SerialException
      */
     public function setCharacterLength($int)
     {
         if ($this->_dState !== SERIAL_DEVICE_SET) {
-            trigger_error("Unable to set length of a character : the device " .
-                          "is either not set or opened", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Unable to set length of a character : the device " .
+                          "is either not set or opened");
         }
 
         $int = (int) $int;
@@ -374,29 +357,25 @@ class SerialConnection
             return true;
         }
 
-        trigger_error(
-            "Unable to set character length : " .$out[1],
-            E_USER_WARNING
+        throw new SerialException(
+            "Unable to set character length : " .$out[1]
         );
-
-        return false;
     }
 
     /**
      * Sets the length of stop bits.
      *
-     * @param  float $length the length of a stop bit. It must be either 1,
+     * @param float $length the length of a stop bit. It must be either 1,
      *                       1.5 or 2. 1.5 is not supported under linux and on
      *                       some computers.
      * @return bool
+     * @throws SerialException
      */
     public function setStopBits($length)
     {
         if ($this->_dState !== SERIAL_DEVICE_SET) {
-            trigger_error("Unable to set the length of a stop bit : the " .
-                          "device is either not set or opened", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Unable to set the length of a stop bit : the " .
+                          "device is either not set or opened");
         }
 
         if ($length != 1
@@ -404,12 +383,9 @@ class SerialConnection
                 and $length != 1.5
                 and !($length == 1.5 and $this->_os === "linux")
         ) {
-            trigger_error(
-                "Specified stop bit length is invalid",
-                E_USER_WARNING
+            throw new InvalidArgumentException(
+                "Specified stop bit length is invalid"
             );
-
-            return false;
         }
 
         if ($this->_os === "linux") {
@@ -435,30 +411,26 @@ class SerialConnection
             return true;
         }
 
-        trigger_error(
-            "Unable to set stop bit length : " . $out[1],
-            E_USER_WARNING
+        throw new SerialException(
+            "Unable to set stop bit length : " . $out[1]
         );
-
-        return false;
     }
 
     /**
      * Configures the flow control
      *
-     * @param  string $mode Set the flow control mode. Availible modes :
+     * @param string $mode Set the flow control mode. Availible modes :
      *                      -> "none" : no flow control
      *                      -> "rts/cts" : use RTS/CTS handshaking
      *                      -> "xon/xoff" : use XON/XOFF protocol
      * @return bool
+     * @throws SerialException
      */
     public function setFlowControl($mode)
     {
         if ($this->_dState !== SERIAL_DEVICE_SET) {
-            trigger_error("Unable to set flow control mode : the device is " .
-                          "either not set or opened", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Unable to set flow control mode : the device is " .
+                          "either not set or opened");
         }
 
         $linuxModes = array(
@@ -473,9 +445,7 @@ class SerialConnection
         );
 
         if ($mode !== "none" and $mode !== "rts/cts" and $mode !== "xon/xoff") {
-            trigger_error("Invalid flow control mode specified", E_USER_ERROR);
-
-            return false;
+            throw new SerialException("Invalid flow control mode specified");
         }
 
         if ($this->_os === "linux") {
@@ -498,24 +468,22 @@ class SerialConnection
         if ($ret === 0) {
             return true;
         } else {
-            trigger_error(
-                "Unable to set flow control : " . $out[1],
-                E_USER_ERROR
+            throw new SerialException(
+                "Unable to set flow control : " . $out[1]
             );
-
-            return false;
         }
     }
 
     /**
      * Sets a setserial parameter (cf man setserial)
      * NO MORE USEFUL !
-     * 	-> No longer supported
-     * 	-> Only use it if you need it
+     *    -> No longer supported
+     *    -> Only use it if you need it
      *
-     * @param  string $param parameter name
-     * @param  string $arg   parameter value
+     * @param string $param parameter name
+     * @param string $arg parameter value
      * @return bool
+     * @throws SerialException
      */
     public function setSetSerialFlag($param, $arg = "")
     {
@@ -528,13 +496,9 @@ class SerialConnection
         );
 
         if ($return{0} === "I") {
-            trigger_error("setserial: Invalid flag", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("setserial: Invalid flag");
         } elseif ($return{0} === "/") {
-            trigger_error("setserial: Error with device file", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("setserial: Error with device file");
         } else {
             return true;
         }
@@ -551,8 +515,9 @@ class SerialConnection
     /**
      * Sends a string to the device
      *
-     * @param string $str          string to be sent to the device
-     * @param float  $waitForReply time to wait for the reply (in seconds)
+     * @param string $message string to be sent to the device
+     * @param float $waitForReply time to wait for the reply (in seconds)
+     * @throws SerialException
      */
     public function send($message, $waitForReply = 0.1)
     {
@@ -571,13 +536,12 @@ class SerialConnection
      * @param int $count Number of characters to be read (will stop before
      *                   if less characters are in the buffer)
      * @return string
+     * @throws SerialException
      */
     public function readPort($count = 0)
     {
         if ($this->_dState !== SERIAL_DEVICE_OPENED) {
-            trigger_error("Device must be opened to read it", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Device must be opened to read it");
         }
 
         if ($this->_os === "linux" || $this->_os === "osx") {
@@ -630,6 +594,7 @@ class SerialConnection
      * Renamed from flush for osx compat. issues
      *
      * @return bool
+     * @throws SerialException
      */
     public function flush()
     {
@@ -643,9 +608,7 @@ class SerialConnection
             return true;
         } else {
             $this->_buffer = "";
-            trigger_error("Error while sending message", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Error while sending message");
         }
     }
 
@@ -657,26 +620,27 @@ class SerialConnection
     // INTERNAL TOOLKIT -- {START}
     //
 
+    /**
+     * @return bool
+     * @throws SerialException
+     */
     public function _ckOpened()
     {
         if ($this->_dState !== SERIAL_DEVICE_OPENED) {
-            trigger_error("Device must be opened", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Device must be opened");
         }
 
         return true;
     }
 
+    /**
+     * @throws SerialException
+     */
     public function _ckClosed()
     {
         if ($this->_dState === SERIAL_DEVICE_OPENED) {
-            trigger_error("Device must be closed", E_USER_WARNING);
-
-            return false;
+            throw new SerialException("Device must be closed");
         }
-
-        return true;
     }
 
     public function _exec($cmd, &$out = null)
