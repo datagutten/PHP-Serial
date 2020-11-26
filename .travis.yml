@@ -26,6 +26,10 @@ jobs:
        cache:
          directories:
            - $LOCALAPPDATA/Composer/files
+    - os: osx
+      before_install:
+        - brew install php
+        - brew install composer
 
   allow_failures:
     - php: 'nightly'
