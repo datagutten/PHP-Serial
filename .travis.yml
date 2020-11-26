@@ -23,6 +23,8 @@ jobs:
          - choco install composer
          - choco install com0com
          - export PATH="/c/tools/php74:/c/ProgramData/ComposerSetup/bin/:$PATH"
+         - wget -O /c/tools/php74/ext/php_xdebug-3.0.0-7.4-vc15-nts-x86_64.dll https://xdebug.org/files/php_xdebug-3.0.0-7.4-vc15-nts-x86_64.dll
+         - cp $TRAVIS_BUILD_DIR/tests/config/php_windows.ini /c/tools/php74/php.ini
        cache:
          directories:
            - $LOCALAPPDATA/Composer/files
@@ -36,6 +38,7 @@ jobs:
         - brew install php
         - brew install composer
         - pecl install xdebug
+        - cp $TRAVIS_BUILD_DIR/tests/config/php_mac.ini /usr/local/etc/php/7.4/php.ini
       cache:
         directories:
           - $HOME/Library/Caches/Homebrew
