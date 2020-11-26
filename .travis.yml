@@ -26,17 +26,22 @@ jobs:
        cache:
          directories:
            - $LOCALAPPDATA/Composer/files
+       after_script:
+         - bash <(curl -s https://codecov.io/bash)
     - os: osx
       osx_image: xcode12.2
       language: shell
       before_install:
         - brew install php
         - brew install composer
+        - pecl install xdebug
       cache:
         directories:
           - $HOME/Library/Caches/Homebrew
       before_cache:
         - brew cleanup
+      after_script:
+        - bash <(curl -s https://codecov.io/bash)
 
   allow_failures:
     - php: 'nightly'
