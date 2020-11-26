@@ -20,6 +20,7 @@ class Serial
         {
             case 'WINNT': return new connection\Windows($device);
             case 'Linux': return new connection\Linux($device);
+            case 'Darwin': return new connection\OSX($device);
             default: throw new SerialException(sprintf('Unsupported operating system: %s', PHP_OS));
         }
     }
