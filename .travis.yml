@@ -41,10 +41,9 @@ jobs:
         # - cp $TRAVIS_BUILD_DIR/tests/config/php_mac.ini /usr/local/etc/php/7.4/php.ini
         - echo xdebug.mode=coverage>>/usr/local/etc/php/7.4/php.ini
         - sh -c "mkdir -p ${TRAVIS_BUILD_DIR}/travis/module-cache/`php-config --vernum`"
-        - wget -O ./travis/modulecache.sh https://raw.githubusercontent.com/easybiblabs/travis-pecl-cache/master/travis/modulecache.sh
-        - chmod +x ./travis/modulecache.sh
+        - chmod +x ./tests/modulecache.sh
       before_script:
-        - MODULES="xdebug.so:xdebug" ./travis/modulecache.sh
+        - MODULES="xdebug.so:xdebug" ./tests/modulecache.sh
       cache:
         directories:
           - $HOME/Library/Caches/Homebrew
