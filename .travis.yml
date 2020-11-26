@@ -32,6 +32,7 @@ jobs:
       osx_image: xcode12.2
       language: shell
       before_install:
+        - export HOMEBREW_NO_AUTO_UPDATE=1
         - brew install php
         - brew install composer
         - pecl install xdebug
