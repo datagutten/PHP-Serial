@@ -27,6 +27,7 @@ jobs:
          directories:
            - $LOCALAPPDATA/Composer/files
     - os: osx
+      language: shell
       before_install:
         - brew install php
         - brew install composer
