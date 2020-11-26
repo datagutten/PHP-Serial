@@ -38,7 +38,8 @@ jobs:
         - brew install php
         - brew install composer
         - pecl install xdebug
-        - cp $TRAVIS_BUILD_DIR/tests/config/php_mac.ini /usr/local/etc/php/7.4/php.ini
+        # - cp $TRAVIS_BUILD_DIR/tests/config/php_mac.ini /usr/local/etc/php/7.4/php.ini
+        - echo xdebug.mode=coverage>>/usr/local/etc/php/7.4/php.ini
       cache:
         directories:
           - $HOME/Library/Caches/Homebrew
