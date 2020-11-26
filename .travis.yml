@@ -22,6 +22,7 @@ jobs:
          - choco install php --version 7.4
          - choco install composer
          - choco install com0com
+         - export PATH="/c/tools/php74:/c/ProgramData/ComposerSetup/bin/:$PATH"
        cache:
          directories:
            - $LOCALAPPDATA/Composer/files
