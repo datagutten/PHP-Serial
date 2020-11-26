@@ -27,10 +27,16 @@ jobs:
          directories:
            - $LOCALAPPDATA/Composer/files
     - os: osx
+      osx_image: xcode12.2
       language: shell
       before_install:
         - brew install php
         - brew install composer
+      cache:
+        directories:
+          - $HOME/Library/Caches/Homebrew
+      before_cache:
+        - brew cleanup
 
   allow_failures:
     - php: 'nightly'
