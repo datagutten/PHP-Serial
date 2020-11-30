@@ -5,9 +5,10 @@ namespace datagutten\phpSerial\connection;
 
 
 use datagutten\phpSerial\exceptions;
+use datagutten\phpSerial\exceptions\SerialException;
 use Symfony\Component\Process\Process;
 
-class OSX extends Connection
+class OSX extends Posix
 {
     /**
      * OSX constructor.
@@ -26,11 +27,11 @@ class OSX extends Connection
         $this->open();
     }
 
-    function setBaudRate(int $rate)
+    protected function stty($args, string $message): Process
     {
-        $process = new Process(['stty', '-f', $this->device, $rate]);
-        $process->run();
-        if(!$process->isSuccessful())
-            throw new exceptions\ProcessException('Unable to set baud rate', $process);
+        if(!is_array($args))
+            $args = [$args];
+
+        return $this->exec(['stty', '-f', $this->device] + $args, $message);
     }
 }

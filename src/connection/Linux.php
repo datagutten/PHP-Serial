@@ -5,9 +5,10 @@ namespace datagutten\phpSerial\connection;
 
 
 use datagutten\phpSerial\exceptions;
+use datagutten\phpSerial\exceptions\SerialException;
 use Symfony\Component\Process\Process;
 
-class Linux extends Connection
+class Linux extends Posix
 {
     /**
      * Linux constructor.
@@ -27,19 +28,19 @@ class Linux extends Connection
         $this->open();
     }
 
+    protected function stty($args, string $message): Process
+    {
+        if(!is_array($args))
+            return $this->exec(['stty', '-F', $this->device, $args], $message);
+        else
+            return $this->exec(['stty', '-F', $this->device] + $args, $message);
+    }
+
     public static function convert_port($device)
     {
         if (preg_match("@^COM(\\d+):?$@i", $device, $matches))
             return "/dev/ttyS" . ($matches[1] - 1);
         else
             return $device;
-    }
-
-    function setBaudRate(int $rate)
-    {
-        $process = new Process(['stty', '-F', $this->device, $rate]);
-        $process->run();
-        if(!$process->isSuccessful())
-            throw new exceptions\ProcessException('Unable to set baud rate', $process);
     }
 }
