@@ -31,6 +31,7 @@ jobs:
        after_script:
          - bash <(curl -s https://codecov.io/bash)
     - os: osx
+      language: shell
       osx_image: xcode12.2
       before_install:
         - export HOMEBREW_NO_AUTO_UPDATE=1
@@ -43,6 +44,9 @@ jobs:
         - export PHPENV_ROOT="$HOME/.phpenv"
         - export PATH="$PHPENV_ROOT/bin:$PATH"
         - phpenv init -
+        - phpenv install -l
+        - phpenv install 7.3.7
+        - phpenv rehash
       before_script:
         - MODULES="xdebug.so:xdebug" ./tests/modulecache.sh
       cache:
