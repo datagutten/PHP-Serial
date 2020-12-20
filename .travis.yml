@@ -32,16 +32,17 @@ jobs:
          - bash <(curl -s https://codecov.io/bash)
     - os: osx
       osx_image: xcode12.2
-      language: shell
       before_install:
         - export HOMEBREW_NO_AUTO_UPDATE=1
-        - brew install php
-        - brew install composer
-        - pecl install xdebug
-        # - cp $TRAVIS_BUILD_DIR/tests/config/php_mac.ini /usr/local/etc/php/7.4/php.ini
         - echo xdebug.mode=coverage>>/usr/local/etc/php/7.4/php.ini
         - sh -c "mkdir -p ${TRAVIS_BUILD_DIR}/travis/module-cache/`php-config --vernum`"
         - chmod +x ./tests/modulecache.sh
+        - git clone https://github.com/madumlao/phpenv.git ~/.phpenv
+        - brew install re2c openssl bison libxml2 autoconf automake icu4c libjpeg libpng libmcrypt libzip
+        - export PATH="/usr/local/opt/bison/bin:$PATH"
+        - export PHPENV_ROOT="$HOME/.phpenv"
+        - export PATH="$PHPENV_ROOT/bin:$PATH"
+        - phpenv init -
       before_script:
         - MODULES="xdebug.so:xdebug" ./tests/modulecache.sh
       cache:
