@@ -68,4 +68,4 @@ before_script:
  - vendor/bin/phpunit --version
 
 script:
- - vendor/bin/phpunit
+ - sudo vendor/bin/phpunit
