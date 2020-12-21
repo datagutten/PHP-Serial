@@ -35,7 +35,6 @@ jobs:
       osx_image: xcode12.2
       before_install:
         - export HOMEBREW_NO_AUTO_UPDATE=1
-        - echo xdebug.mode=coverage>>/usr/local/etc/php/7.4/php.ini
         - sh -c "mkdir -p ${TRAVIS_BUILD_DIR}/travis/module-cache/`php-config --vernum`"
         - chmod +x ./tests/modulecache.sh
         - git clone https://github.com/madumlao/phpenv.git ~/.phpenv
